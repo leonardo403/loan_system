@@ -1,0 +1,74 @@
+version: '3.13'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: loan_backend_app
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:jtdsN8pI+PkBm9rD1QK5mV3eWxYzFgHiJsLmNoPqRsTuVwXaYbCdEfGhIjKlMnOpQ==
+      - APP_URL=http://localhost
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=loan_system
+      - DB_USERNAME=loan_user
+      - DB_PASSWORD=loan_password
+      - CACHE_STORE=database
+      - QUEUE_CONNECTION=database
+      - SESSION_DRIVER=database
+    volumes:
+      - ./:/app
+      - ./storage/logs:/app/storage/logs
+    networks:
+      - loan_network
+    depends_on:
+      - mysql
+    ports:
+      - "9000:9000"
+
+  mysql:
+    image: mysql:8.0
+    container_name: loan_backend_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-loan_system}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-loan_password}
+      MYSQL_USER: ${DB_USERNAME:-loan_user}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'false'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - loan_network
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+
+  nginx:
+    image: nginx:alpine
+    container_name: loan_backend_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/app
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - loan_network
+    depends_on:
+      - app
+
+networks:
+  loan_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

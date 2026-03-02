@@ -1,0 +1,116 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.backup
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-workspace
+*.sublime-project
+.editorconfig
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
+
+# Node dependencies
+node_modules/
+npm-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+build/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# Laravel
+/vendor/
+/node_modules/
+composer.lock
+storage/logs/*
+storage/debugbar/*
+bootstrap/cache/*
+.phpunit.result.cache
+*.log
+*.pot
+
+# Vite/Build
+loan-frontend/.vite/
+loan-frontend/dist/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Database
+*.sqlite
+*.sqlite3
+database.db
+
+# IDE specific
+.vscode/settings.json
+.vscode/extensions.json
+
+# Project specific
+storage/app/private/*
+!storage/app/private/.gitkeep
+storage/framework/cache/*
+!storage/framework/cache/.gitkeep
+storage/framework/sessions/*
+!storage/framework/sessions/.gitkeep
+storage/framework/views/*
+!storage/framework/views/.gitkeep
+storage/framework/testing/*
+!storage/framework/testing/.gitkeep
+
+# Frontend specific
+loan-frontend/dist/
+loan-frontend/.env.local
+loan-frontend/.env.*.local
+
+# Backend specific  
+loan-backend/vendor/
+loan-backend/node_modules/
+loan-backend/.env.local
+loan-backend/storage/logs/*
+loan-backend/bootstrap/cache/*
+loan-backend/database/database.sqlite
+
+# Testing
+.phpunit.xml
+.phpunit.result.cache
+coverage/
+.nyc_output/
+
+# Misc
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Local development
+*.pem
+*.key
+local.env

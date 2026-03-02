@@ -1,0 +1,17 @@
+/.git
+/.gitignore
+/.gitattributes
+/node_modules
+/vendor
+.env
+.env.*.php
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+/.idea
+/.vscode
+/storage/logs
+/bootstrap/cache
+*.log
+.DS_Store
+Thumbs.db
