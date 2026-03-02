@@ -42,22 +42,47 @@ fi
 
 echo ""
 echo -e "${YELLOW}→ Construindo imagens Docker...${NC}"
-docker-compose build
+if ! docker-compose build; then
+    echo -e "${RED}❌ Erro ao construir imagens Docker!${NC}"
+    echo -e "${YELLOW}→ Mostrando logs:${NC}"
+    docker-compose logs
+    exit 1
+fi
 
 echo ""
 echo -e "${YELLOW}→ Iniciando containers...${NC}"
-docker-compose up -d
+if ! docker-compose up -d; then
+    echo -e "${RED}❌ Erro ao iniciar containers!${NC}"
+    docker-compose logs
+    exit 1
+fi
 
 echo -e "${GREEN}✓ Containers iniciados${NC}"
 echo ""
 
 # Aguardar MySQL
 echo -e "${YELLOW}→ Aguardando banco de dados ficar pronto...${NC}"
-sleep 10
+sleep 15
+
+# Verificar se o vendor foi instalado
+echo -e "${YELLOW}→ Verificando instalação de dependências...${NC}"
+if ! docker-compose exec -T app test -d vendor; then
+    echo -e "${RED}❌ Vendor não foi instalado!${NC}"
+    echo -e "${YELLOW}→ Reinstalando dependências...${NC}"
+    if ! docker-compose exec -T app composer install --no-dev --no-interaction; then
+        echo -e "${RED}❌ Erro ao instalar dependências!${NC}"
+        docker-compose logs app
+        exit 1
+    fi
+fi
 
 # Executar migrações
 echo -e "${YELLOW}→ Executando migrações do banco de dados...${NC}"
-docker-compose exec -T app php artisan migrate --force
+if ! docker-compose exec -T app php artisan migrate --force; then
+    echo -e "${RED}❌ Erro ao executar migrações!${NC}"
+    docker-compose logs app
+    exit 1
+fi
 
 echo -e "${GREEN}✓ Migrações executadas${NC}"
 echo ""
@@ -65,7 +90,11 @@ echo ""
 # Gerar chave se necessário
 if ! grep -q "^APP_KEY=base64:" .env || grep -q "^APP_KEY=$" .env; then
     echo -e "${YELLOW}→ Gerando chave da aplicação...${NC}"
-    docker-compose exec -T app php artisan key:generate
+    if ! docker-compose exec -T app php artisan key:generate; then
+        echo -e "${RED}❌ Erro ao gerar chave!${NC}"
+        docker-compose logs app
+        exit 1
+    fi
     echo -e "${GREEN}✓ Chave gerada${NC}"
 else
     echo -e "${YELLOW}ℹ Chave da aplicação já existe${NC}"

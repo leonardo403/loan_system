@@ -31,21 +31,27 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Definir diretório de trabalho
 WORKDIR /app
 
-# Copiar arquivos do projeto
-COPY . /app
-
-# Criar e configurar permissões dos diretórios ANTES de instalar dependências
-RUN mkdir -p storage/app storage/framework storage/logs bootstrap/cache && \
-    chown -R www-data:www-data /app && \
-    chmod -R 755 /app && \
-    chmod -R 777 storage bootstrap/cache
+# Copiar arquivos composer primeiro (melhor cache do Docker)
+COPY composer.json composer.lock* ./
 
 # Instalar dependências PHP
-RUN composer install --optimize-autoloader --no-dev --no-interaction
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --optimize-autoloader \
+    --prefer-dist \
+    && composer cache:clear
 
-# Garantir permissões corretas após composer
+# Copiar resto dos arquivos do projeto
+COPY . .
+
+# Criar e configurar permissões dos diretórios
+RUN mkdir -p storage/app storage/framework storage/logs bootstrap/cache
+
+# Garantir permissões corretas
 RUN chown -R www-data:www-data /app && \
-    chmod -R 755 bootstrap storage && \
+    chmod -R 755 /app && \
     chmod -R 777 bootstrap/cache storage/logs storage/app
 
 # Expor porta
